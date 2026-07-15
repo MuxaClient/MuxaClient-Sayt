@@ -57,7 +57,7 @@ export default function AuthScreen() {
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden bg-[#07070b]">
       {/* Background image — 4K ultra HD */}
       <motion.div
-        className="absolute inset-0 blur-[2px] scale-110"
+        className="absolute inset-0 scale-110"
         style={{
           backgroundImage: `url('${BASE}landing_1.jpg')`,
           backgroundSize: 'cover',
