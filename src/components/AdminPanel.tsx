@@ -383,25 +383,61 @@ function UsersList() {
 
   const load = () => {
     supabase.from('plans').select('*').order('sort_order').then(({ data }) => setPlans(data ?? []));
-    supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .then(async ({ data }) => {
-        const profiles = data ?? [];
-        const subs = await supabase
-          .from('subscriptions')
-          .select('*, plan:plans(*)')
-          .in('user_id', profiles.map((p) => p.id))
-          .eq('status', 'active')
-          .order('end_date', { ascending: false });
-        const subMap = new Map<string, Subscription>();
-        (subs.data ?? []).forEach((s) => {
-          if (!subMap.has(s.user_id)) subMap.set(s.user_id, s);
-        });
-        setUsers(profiles.map((p) => ({ ...p, active_subscription: subMap.get(p.id) ?? null })));
-        setLoading(false);
+
+    const [{ data: profiles }, { data: clientAccess }] = await Promise.all([
+      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+      supabase.from('client_access').select('user_id, email, username, hwid, role, subscription_active, subscription_end_date').order('created_at', { ascending: false }),
+    ]);
+
+    const profileList = profiles ?? [];
+    const caList = clientAccess ?? [];
+
+    const mergedMap = new Map<string, any>();
+
+    for (const ca of caList) {
+      if (!ca.user_id) continue;
+      mergedMap.set(ca.user_id, {
+        id: ca.user_id,
+        email: ca.email ?? '',
+        username: ca.username ?? ca.email?.split('@')[0] ?? '',
+        hwid: ca.hwid ?? null,
+        is_admin: false,
+        is_blocked: false,
+        created_at: '',
       });
+    }
+
+    for (const p of profileList) {
+      const existing = mergedMap.get(p.id);
+      mergedMap.set(p.id, {
+        ...(existing ?? {}),
+        id: p.id,
+        email: p.email ?? existing?.email ?? '',
+        username: p.username ?? existing?.username ?? '',
+        hwid: p.hwid ?? existing?.hwid ?? null,
+        is_admin: p.is_admin ?? false,
+        is_blocked: p.is_blocked ?? false,
+        created_at: p.created_at ?? existing?.created_at ?? '',
+      });
+    }
+
+    const allUsers = [...mergedMap.values()];
+    const userIds = allUsers.map((u) => u.id);
+
+    const { data: subs } = await supabase
+      .from('subscriptions')
+      .select('*, plan:plans(*)')
+      .in('user_id', userIds)
+      .eq('status', 'active')
+      .order('end_date', { ascending: false });
+
+    const subMap = new Map<string, Subscription>();
+    (subs ?? []).forEach((s) => {
+      if (!subMap.has(s.user_id)) subMap.set(s.user_id, s);
+    });
+
+    setUsers(allUsers.map((p) => ({ ...p, active_subscription: subMap.get(p.id) ?? null })));
+    setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
