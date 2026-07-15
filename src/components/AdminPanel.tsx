@@ -381,7 +381,7 @@ function UsersList() {
   const [openSubUser, setOpenSubUser] = useState<string | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
 
-  const load = () => {
+  const load = async () => {
     supabase.from('plans').select('*').order('sort_order').then(({ data }) => setPlans(data ?? []));
 
     const [{ data: profiles }, { data: clientAccess }] = await Promise.all([
