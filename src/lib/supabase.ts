@@ -77,11 +77,17 @@ export async function syncClientAccessForUser(input: {
   subscriptionActive?: boolean;
   subscriptionEndDate?: string | null;
 }) {
+  const { data: existing } = await supabase
+    .from('client_access')
+    .select('hwid')
+    .eq('user_id', input.userId)
+    .maybeSingle();
+
   return supabase.from('client_access').upsert({
     user_id: input.userId,
     email: input.email ?? null,
     username: input.username ?? null,
-    hwid: input.hwid ?? null,
+    hwid: input.hwid ?? existing?.hwid ?? null,
     role: input.role ?? 'User',
     subscription_active: input.subscriptionActive ?? false,
     subscription_end_date: input.subscriptionEndDate ?? null,

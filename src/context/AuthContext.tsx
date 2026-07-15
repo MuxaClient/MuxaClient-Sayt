@@ -33,11 +33,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Profile fetch error:', error);
       }
 
-      const profileData = data as Profile | null;
-      setProfile(profileData);
+      let profileData = data as Profile | null;
 
       if (profileData) {
         try {
+          const { data: clientAccess } = await supabase
+            .from('client_access')
+            .select('hwid')
+            .eq('user_id', userId)
+            .maybeSingle();
+
+          const resolvedHwid = profileData.hwid || clientAccess?.hwid || null;
+
+          if (resolvedHwid && !profileData.hwid) {
+            await supabase
+              .from('profiles')
+              .update({ hwid: resolvedHwid })
+              .eq('id', userId);
+            profileData = { ...profileData, hwid: resolvedHwid };
+          }
+
           const { data: subData } = await supabase
             .from('subscriptions')
             .select('status,end_date')
@@ -51,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             userId,
             email: profileData.email,
             username: profileData.username,
-            hwid: profileData.hwid,
+            hwid: resolvedHwid,
             role: profileData.is_admin ? 'Admin' : 'User',
             subscriptionActive: Boolean(isActive),
             subscriptionEndDate: subData?.end_date ?? null,
@@ -60,6 +75,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.error('syncClientAccess error:', syncErr);
         }
       }
+
+      setProfile(profileData);
     } catch (err) {
       console.error('fetchProfile error:', err);
     }
