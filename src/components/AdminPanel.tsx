@@ -146,11 +146,8 @@ function PendingPayments() {
         .update({ hwid: null })
         .eq('id', receipt.user_id);
 
-      // Client access HWID ni tozalash
-      await supabase
-        .from('client_access')
-        .update({ hwid: null })
-        .eq('user_id', receipt.user_id);
+      // Client access HWID ni tozalash via RPC
+      await supabase.rpc('clear_hwid', { p_user_id: receipt.user_id });
 
       await supabase
         .from('receipts')
@@ -411,7 +408,7 @@ function UsersList() {
 
   const resetHwid = async (user: UserWithSub) => {
     await supabase.from('profiles').update({ hwid: null }).eq('id', user.id);
-    await supabase.from('client_access').update({ hwid: null }).eq('user_id', user.id);
+    await supabase.rpc('clear_hwid', { p_user_id: user.id });
     toast.success('HWID o\'chirildi');
     load();
   };
@@ -446,10 +443,10 @@ function UsersList() {
       .eq('user_id', user.id)
       .eq('status', 'active');
 
-    await supabase
-      .from('client_access')
-      .update({ subscription_active: false })
-      .eq('user_id', user.id);
+    await supabase.rpc('admin_update_client_access', {
+      p_user_id: user.id,
+      p_subscription_active: false,
+    });
 
     toast.success('Obuna olib tashlandi');
     load();
@@ -463,17 +460,20 @@ function UsersList() {
       ? new Date(user.active_subscription.end_date)
       : startDate;
     endDate = new Date(base.getTime() + plan.duration_days * 24 * 60 * 60 * 1000);
-    await supabase.from('subscriptions').insert({
-      user_id: user.id,
-      plan_id: plan.id,
-      status: 'active',
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-    });
     await supabase
-      .from('client_access')
-      .update({ subscription_active: true, subscription_end_date: endDate.toISOString() })
-      .eq('user_id', user.id);
+      .from('subscriptions')
+      .insert({
+        user_id: user.id,
+        plan_id: plan.id,
+        status: 'active',
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+      });
+    await supabase.rpc('admin_update_client_access', {
+      p_user_id: user.id,
+      p_subscription_active: true,
+      p_subscription_end_date: endDate.toISOString(),
+    });
     setExtending(null);
     toast.success('Obuna uzaytirildi');
     load();
