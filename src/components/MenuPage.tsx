@@ -68,9 +68,12 @@ export default function MenuPage() {
         variants={stagger}
         className="mb-10"
       >
-        <motion.div variants={fadeUp} className="flex items-center gap-2 mb-6">
-          <Zap className="w-5 h-5 text-accent drop-shadow-[0_0_8px_var(--accent-ring)]" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Funksiyalar</h2>
+        <motion.div variants={fadeUp} className="text-center mb-8">
+          <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-32 h-32 mx-auto mb-4 object-contain drop-shadow-[0_0_20px_var(--accent-ring)]" />
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Zap className="w-5 h-5 text-accent drop-shadow-[0_0_8px_var(--accent-ring)]" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Funksiyalar</h2>
+          </div>
         </motion.div>
         <motion.div variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f) => (
