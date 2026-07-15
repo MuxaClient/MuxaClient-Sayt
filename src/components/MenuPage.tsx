@@ -17,33 +17,33 @@ import {
 import { Card } from './ui/Card';
 
 const features = [
-  { icon: <Zap className="w-6 h-6" />, title: 'Tez ishlaydi', desc: "Yuqori FPS va minimal ping ta'sirida ishlaydi." },
-  { icon: <Eye className="w-6 h-6" />, title: 'ESP & Aimbot', desc: 'Dushmanlarni devor orqali ko\'r, aniq nishon ol.' },
-  { icon: <Lock className="w-6 h-6" />, title: 'Xavfsiz & Yashirin', desc: 'Anti-cheat tizimlardan himoyalangan.' },
-  { icon: <Clock className="w-6 h-6" />, title: '24/7 Yangilanadi', desc: 'O\'yin yangilanishi bilan bir vaqtda yangilanadi.' },
-  { icon: <Cpu className="w-6 h-6" />, title: 'HWID Himoya', desc: 'Har bir litsenziya qurilmangizga bog\'langan.' },
-  { icon: <Users className="w-6 h-6" />, title: 'Faol Jamiyat', desc: 'Ko\'p ming foydalanuvchi bilan birgalikda.' },
+  { icon: <Zap className="w-6 h-6" />, title: 'FPS va PING', desc: "Ko'proq Fps va Past Ping Tasrida Ishlaydi." },
+  { icon: <Eye className="w-6 h-6" />, title: 'ESP va HurjimAura', desc: 'Dushmanlarni devor orqali ko\'radi hamda Dushmanni Avtamatik Uradi.' },
+  { icon: <Lock className="w-6 h-6" />, title: 'Antichitlarga Qarshi', desc: 'Anti-cheat tizimlarini Buzib Bypass Qladi Ban va Kicklar Yoq.' },
+  { icon: <Clock className="w-6 h-6" />, title: '24/7 Qo\'llab-Quvatlash', desc: 'Agarda Muamolar Busa Telegramdan Yordam Beramiz : @MuxammaddinUz.' },
+  { icon: <Cpu className="w-6 h-6" />, title: 'Hwid Himoya', desc: 'Har bir litsenziya qurilmangizga bog\'langan va Boshqa Qurlmalar Kira Olmaydi.' },
+  { icon: <Users className="w-6 h-6" />, title: 'Dizayn', desc: 'Ko\'p Effektlar va Choryli Atmasfera Chroyli va Kerakli Funksiyalar.' },
 ];
 
 const reviews = [
   {
-    name: 'Jamshid',
-    text: 'Muxa Client eng yaxshi cheat! 2 oydirki ishlataman, ban yo\'q. Aimbot juda zo\'r.',
+    name: 'Sadik',
+    text: 'eng yaxshi chit bu Muxa Client 180 Kunlik ishlataman, ban yo\'q. Funksiyalari juda zo\'r',
     stars: 5,
   },
   {
-    name: 'Aziz',
-    text: 'Raqobatchilardan ancha ustun. FPS tushmaydi, hammasi silliq. Tavsiya qilaman!',
+    name: 'thisBEKA',
+    text: 'Muxa Client Juda Zor Manga Yoqti 90 Kunlik Olganman Yaxshi Ishlayabti Tavsiya Qlaman',
     stars: 5,
   },
   {
-    name: 'Shohruh',
-    text: 'Support tez va sifatli. HWID muammo bo\'lganda 5 daqiqada hal qilishdi.',
+    name: 'Ilxomov',
+    text: 'Zor Hamma Serverda Yaxshi Ishlayabti Muxa Client 10/10 clientga MuxaClient Legend',
     stars: 5,
   },
   {
-    name: 'Oybek',
-    text: 'Lifetime obuna oldim, cheksiz foydalanaman. Puliga arziydigan mahsulot.',
+    name: 'Izzatilo',
+    text: 'Chit vabshe Zor Muxa Clietn Yaxshi Menusi Ham Chroyli',
     stars: 5,
   },
 ];
