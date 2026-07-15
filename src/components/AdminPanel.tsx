@@ -194,6 +194,11 @@ function PendingPayments() {
     }
 
     await supabase
+      .from('client_access')
+      .update({ subscription_active: true, subscription_end_date: endDate.toISOString() })
+      .eq('user_id', receipt.user_id);
+
+    await supabase
       .from('receipts')
       .update({ status: 'approved', reviewed_at: new Date().toISOString() })
       .eq('id', receipt.id);
@@ -406,6 +411,7 @@ function UsersList() {
 
   const resetHwid = async (user: UserWithSub) => {
     await supabase.from('profiles').update({ hwid: null }).eq('id', user.id);
+    await supabase.from('client_access').update({ hwid: null }).eq('user_id', user.id);
     toast.success('HWID o\'chirildi');
     load();
   };
@@ -440,6 +446,11 @@ function UsersList() {
       .eq('user_id', user.id)
       .eq('status', 'active');
 
+    await supabase
+      .from('client_access')
+      .update({ subscription_active: false })
+      .eq('user_id', user.id);
+
     toast.success('Obuna olib tashlandi');
     load();
   };
@@ -459,6 +470,10 @@ function UsersList() {
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
     });
+    await supabase
+      .from('client_access')
+      .update({ subscription_active: true, subscription_end_date: endDate.toISOString() })
+      .eq('user_id', user.id);
     setExtending(null);
     toast.success('Obuna uzaytirildi');
     load();
