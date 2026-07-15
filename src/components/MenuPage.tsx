@@ -70,7 +70,11 @@ export default function MenuPage() {
       >
         <motion.div variants={fadeUp} className="text-center mb-8">
           <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-32 h-32 mx-auto mb-4 object-contain drop-shadow-[0_0_20px_var(--accent-ring)]" />
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-2">MUXA CLIENT</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm max-w-md mx-auto leading-relaxed">
+            Cho'qilarni Zabt Etishdagi Asosiy Vostangiz. Biz Qo'limizdan Kelgancha Sizga G'alabaga Erishish Uchun Yordamdamiz.
+          </p>
+          <div className="flex items-center justify-center gap-2 mt-4">
             <Zap className="w-5 h-5 text-accent drop-shadow-[0_0_8px_var(--accent-ring)]" />
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Funksiyalar</h2>
           </div>
