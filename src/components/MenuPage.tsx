@@ -124,7 +124,7 @@ export default function MenuPage() {
           <motion.div variants={fadeUp} whileHover={{ scale: 1.02 }} className="overflow-hidden group">
             <div className="rounded-2xl overflow-hidden bg-black/20 border border-white/10">
               <img
-                src={`${BASE}landing_1.jpg`}
+                src={`${BASE}photo_2026-07-15_13-38-21.jpg`}
                 alt="Muxa Client screenshot 1"
                 className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
               />
@@ -133,7 +133,7 @@ export default function MenuPage() {
           <motion.div variants={fadeUp} whileHover={{ scale: 1.02 }} className="overflow-hidden group">
             <div className="rounded-2xl overflow-hidden bg-black/20 border border-white/10">
               <img
-                src={`${BASE}landing_1.jpg`}
+                src={`${BASE}photo_2026-07-15_13-38-32.jpg`}
                 alt="Muxa Client screenshot 2"
                 className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
               />
