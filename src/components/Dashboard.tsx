@@ -233,7 +233,7 @@ export default function Dashboard() {
 
       const fileName = `MuxaClient-${userEmail}.jar`;
       const link = document.createElement('a');
-      link.href = '/MuxaClient.jar';
+      link.href = `${BASE}MuxaClient.jar`;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
