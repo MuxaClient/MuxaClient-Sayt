@@ -26,10 +26,10 @@ function AppContent() {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#1a1a2e]">
         <div
-          className="absolute inset-0 bg-cover bg-center blur-lg scale-100"
+          className="absolute inset-0 bg-cover bg-center blur-[2px] scale-100"
           style={{ backgroundImage: `url('${BASE}landing_1.jpg')`, backgroundSize: 'cover', imageRendering: 'auto' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#1a1a2e]/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-[#1a1a2e]/70" />
         <div className="flex flex-col items-center gap-4 relative z-10">
           <div className="w-16 h-16 flex items-center justify-center p-2">
             <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
@@ -53,10 +53,10 @@ function AppContent() {
     return (
       <div className="min-h-screen relative overflow-hidden bg-[#1a1a2e]">
         <div
-          className="fixed inset-0 bg-cover bg-center blur-lg scale-100"
+          className="fixed inset-0 bg-cover bg-center blur-[2px] scale-100"
           style={{ backgroundImage: `url('${BASE}landing_1.jpg')`, backgroundSize: 'cover', imageRendering: 'auto' }}
         />
-      <div className="fixed inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#1a1a2e]/60" />
+      <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/30 to-[#1a1a2e]/70" />
         <div className="relative z-10">
           <PaymentPage
             plan={selectedPlan}
@@ -123,10 +123,10 @@ function AppContent() {
     <div className="min-h-screen relative overflow-hidden bg-[#1a1a2e]">
       {/* 4K Ultra HD background */}
       <div
-        className="fixed inset-0 bg-cover bg-center blur-lg scale-100"
+        className="fixed inset-0 bg-cover bg-center blur-[2px] scale-100"
         style={{ backgroundImage: `url('${BASE}landing_1.jpg')`, backgroundSize: 'cover', imageRendering: 'auto' }}
       />
-        <div className="fixed inset-0 bg-gradient-to-b from-black/50 via-black/20 to-[#1a1a2e]/80" />
+        <div className="fixed inset-0 bg-gradient-to-b from-black/60 via-black/30 to-[#1a1a2e]/70" />
       <motion.div
         className="fixed inset-0 pointer-events-none"
         animate={{ opacity: [0.15, 0.3, 0.15] }}
