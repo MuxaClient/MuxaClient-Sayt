@@ -161,7 +161,7 @@ export default function MenuPage() {
         >
           <iframe
             className="w-full h-full"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+            src="https://www.youtube.com/watch?v=kZicwaG5dlo"
             title="Muxa Client video obzor"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
