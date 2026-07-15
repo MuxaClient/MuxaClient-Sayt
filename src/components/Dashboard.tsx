@@ -200,7 +200,7 @@ export default function Dashboard() {
   };
 
   const getDaysLeft = () => {
-    if (!subscription) return null;
+    if (!subscription || subscription.status !== 'active') return null;
     const end = new Date(subscription.end_date).getTime();
     const now = Date.now();
     return Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
@@ -385,11 +385,11 @@ export default function Dashboard() {
               <div className="flex items-center gap-2">
                 <XCircle className="w-5 h-5 text-red-400" />
                 <span className="text-gray-900 dark:text-white font-medium">
-                  {subscription ? 'Muddati tugagan' : "Obuna yo'q"}
+                  {subscription && subscription.status === 'active' ? 'Faol' : subscription ? 'Muddati tugagan' : "Obuna yo'q"}
                 </span>
               </div>
             )}
-            {subscription?.plan && (
+            {subscription?.plan && subscription.status === 'active' && (
               <p className="text-gray-500 dark:text-gray-500 text-xs mt-1">{subscription.plan.name}</p>
             )}
           </Card>
@@ -415,7 +415,7 @@ export default function Dashboard() {
               Tugash sanasi
             </div>
             <span className="text-gray-900 dark:text-white font-medium text-sm">
-              {subscription
+              {subscription && subscription.status === 'active'
                 ? new Date(subscription.end_date).toLocaleDateString('uz-UZ')
                 : '—'}
             </span>
