@@ -24,6 +24,7 @@ export default function DownloadPage() {
   const [error, setError] = useState<string | null>(null);
 
   const username = profile?.username || user?.email?.split('@')[0] || 'User';
+  const userEmail = profile?.email || user?.email || 'user';
 
   const handleDownload = async () => {
     if (!user || !profile) return;
@@ -47,7 +48,7 @@ export default function DownloadPage() {
         return;
       }
 
-      const fileName = `MuxaClient-${username}.jar`;
+      const fileName = `MuxaClient-${userEmail}.jar`;
       const link = document.createElement('a');
       link.href = '/MuxaClient.jar';
       link.download = fileName;
@@ -127,7 +128,7 @@ export default function DownloadPage() {
               Muxa Client v1.0.0
             </h2>
             <p className="text-gray-400 text-sm mb-6">
-              Fayl nomi: <code className="text-accent">MuxaClient-{username}.jar</code>
+              Fayl nomi: <code className="text-accent">MuxaClient-{userEmail}.jar</code>
             </p>
 
             {profile?.hwid && (
