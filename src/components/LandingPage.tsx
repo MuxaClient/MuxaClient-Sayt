@@ -22,6 +22,8 @@ import { AuthModal } from './AuthModal';
 import { Button } from './ui/Button';
 import { TELEGRAM_URL } from '../lib/supabase';
 
+const BASE = import.meta.env.BASE_URL;
+
 const SECTIONS = [
   { id: 'home', label: 'Bosh Sahifa' },
   { id: 'features', label: 'Funksiyalar' },
@@ -192,7 +194,7 @@ export default function LandingPage() {
         >
           <div
             className="absolute inset-0 bg-cover bg-center blur-lg scale-100"
-            style={{ backgroundImage: "url('/landing_1.jpg')" }}
+            style={{ backgroundImage: `url('${BASE}landing_1.jpg')` }}
           />
           {/* Dark overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/30 to-[#07070b]" />

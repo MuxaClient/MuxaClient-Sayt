@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+
+const BASE = import.meta.env.BASE_URL;
 import { Navbar } from './components/Navbar';
 import AuthScreen from './components/AuthScreen';
 import PricingPage from './components/PricingPage';
@@ -25,12 +27,12 @@ function AppContent() {
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#1a1a2e]">
         <div
           className="absolute inset-0 bg-cover bg-center blur-lg scale-100"
-          style={{ backgroundImage: "url('/landing_1.jpg')", backgroundSize: 'cover', imageRendering: 'auto' }}
+          style={{ backgroundImage: `url('${BASE}landing_1.jpg')`, backgroundSize: 'cover', imageRendering: 'auto' }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#1a1a2e]/60" />
         <div className="flex flex-col items-center gap-4 relative z-10">
           <div className="w-16 h-16 flex items-center justify-center p-2">
-            <img src="/logo.png" alt="Muxa Client" className="w-full h-full object-contain" />
+            <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
           </div>
           <Loader2 className="w-6 h-6 text-accent animate-spin" />
         </div>
@@ -52,7 +54,7 @@ function AppContent() {
       <div className="min-h-screen relative overflow-hidden bg-[#1a1a2e]">
         <div
           className="fixed inset-0 bg-cover bg-center blur-lg scale-100"
-          style={{ backgroundImage: "url('/landing_1.jpg')", backgroundSize: 'cover', imageRendering: 'auto' }}
+          style={{ backgroundImage: `url('${BASE}landing_1.jpg')`, backgroundSize: 'cover', imageRendering: 'auto' }}
         />
       <div className="fixed inset-0 bg-gradient-to-b from-black/20 via-transparent to-[#1a1a2e]/60" />
         <div className="relative z-10">
@@ -122,7 +124,7 @@ function AppContent() {
       {/* 4K Ultra HD background */}
       <div
         className="fixed inset-0 bg-cover bg-center blur-lg scale-100"
-        style={{ backgroundImage: "url('/landing_1.jpg')", backgroundSize: 'cover', imageRendering: 'auto' }}
+        style={{ backgroundImage: `url('${BASE}landing_1.jpg')`, backgroundSize: 'cover', imageRendering: 'auto' }}
       />
         <div className="fixed inset-0 bg-gradient-to-b from-black/50 via-black/20 to-[#1a1a2e]/80" />
       <motion.div

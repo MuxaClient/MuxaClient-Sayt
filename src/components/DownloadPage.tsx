@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { Download, Loader2, CheckCircle, AlertCircle, Shield, Cpu, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+
+const BASE = import.meta.env.BASE_URL;
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 
@@ -118,7 +120,7 @@ export default function DownloadPage() {
         <Card className="p-8">
           <div className="text-center">
             <div className="w-20 h-20 mx-auto mb-6 flex items-center justify-center p-3 rounded-2xl bg-accent/10">
-              <img src="/logo.png" alt="Muxa Client" className="w-full h-full object-contain" />
+              <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
             </div>
 
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">

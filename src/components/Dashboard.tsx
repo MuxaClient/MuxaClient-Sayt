@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase, syncClientAccessForUser, TELEGRAM_URL, type Subscription, type Receipt } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+
+const BASE = import.meta.env.BASE_URL;
 import { toast } from 'sonner';
 import {
   Calendar,
@@ -302,7 +304,7 @@ export default function Dashboard() {
             <div className="bg-black/10 border border-white/10 rounded-xl p-5">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-14 h-14 flex items-center justify-center p-2 rounded-xl bg-accent/10">
-                  <img src="/logo.png" alt="Muxa Client" className="w-full h-full object-contain" />
+                  <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
                 </div>
                 <div>
                   <h4 className="text-gray-900 dark:text-white font-bold text-lg">Muxa Client v1.0.0</h4>

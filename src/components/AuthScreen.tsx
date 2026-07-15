@@ -6,6 +6,8 @@ import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 import { toast } from 'sonner';
 
+const BASE = import.meta.env.BASE_URL;
+
 export default function AuthScreen() {
   const { signIn, signUp } = useAuth();
   const [mode2, setMode2] = useState<'login' | 'signup'>('signup');
@@ -57,7 +59,7 @@ export default function AuthScreen() {
       <motion.div
         className="absolute inset-0 blur-xl scale-110"
         style={{
-          backgroundImage: "url('/landing_1.jpg')",
+          backgroundImage: `url('${BASE}landing_1.jpg')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           imageRendering: 'auto',
@@ -118,7 +120,7 @@ export default function AuthScreen() {
             transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
             className="inline-flex items-center justify-center w-16 h-16 mb-4 p-2"
           >
-            <img src="/logo.png" alt="Muxa Client" className="w-full h-full object-contain" />
+            <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
@@ -277,7 +279,7 @@ export default function AuthScreen() {
                 transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
                 className="w-16 h-16"
               >
-                <img src="/logo.png" alt="Muxa Client" className="w-full h-full object-contain" />
+                <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
               </motion.div>
               <motion.div
                 initial={{ width: 0 }}

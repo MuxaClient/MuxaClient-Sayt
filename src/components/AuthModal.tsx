@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { Lock, Mail, Loader2, X } from 'lucide-react';
 import { Button } from './ui/Button';
+
+const BASE = import.meta.env.BASE_URL;
 import { Input } from './ui/Input';
 import { toast } from 'sonner';
 
@@ -76,7 +78,7 @@ export function AuthModal({ open, onClose }: Props) {
               {/* Logo */}
               <div className="text-center mb-6">
                 <div className="inline-flex items-center justify-center w-14 h-14 mb-3 p-2">
-                  <img src="/logo.png" alt="Muxa Client" className="w-full h-full object-contain" />
+                  <img src={`${BASE}logo.png`} alt="Muxa Client" className="w-full h-full object-contain" />
                 </div>
                 <h2 className="text-xl font-bold text-white">Muxa Client</h2>
                 <p className="text-gray-400 text-xs mt-0.5">Kabinetga kirish</p>
