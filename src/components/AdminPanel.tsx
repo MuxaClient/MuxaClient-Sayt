@@ -877,14 +877,26 @@ function PromoCodes() {
   const [newPlanId, setNewPlanId] = useState('');
   const [newMaxUses, setNewMaxUses] = useState(1);
   const [creating, setCreating] = useState(false);
+  const [usageMap, setUsageMap] = useState<Record<string, { email: string; used_at: string }[]>>({});
 
   const load = async () => {
-    const [promoRes, plansRes] = await Promise.all([
+    const [promoRes, plansRes, usageRes] = await Promise.all([
       supabase.from('promo_codes').select('*, plan:plans(*)').order('created_at', { ascending: false }),
       supabase.from('plans').select('*').order('sort_order'),
+      supabase.from('promo_code_usage').select('promo_code_id, user_id, used_at, profile:profiles(email)'),
     ]);
     setPromoCodes(promoRes.data ?? []);
     setPlans(plansRes.data ?? []);
+
+    const map: Record<string, { email: string; used_at: string }[]> = {};
+    for (const u of (usageRes.data ?? [])) {
+      if (!map[u.promo_code_id]) map[u.promo_code_id] = [];
+      map[u.promo_code_id].push({
+        email: (u.profile as any)?.email || u.user_id,
+        used_at: u.used_at,
+      });
+    }
+    setUsageMap(map);
     setLoading(false);
   };
 
@@ -984,7 +996,7 @@ function PromoCodes() {
           </div>
         </div>
         <p className="text-gray-500 text-xs mt-3">
-          Promokod yaratilgandan so'ng <strong>24 soat</strong> davomida ishlaydi. Har bir foydalanuvchi faqat 1 marta ishlata oladi.
+          Promokod yaratilgandan so'ng <strong>24 soat</strong> davomida ishlaydi. Max foydalanish = 1 qilsangiz, faqat 1 kishi ishlata oladi.
         </p>
       </Card>
 
@@ -1022,6 +1034,17 @@ function PromoCodes() {
                         Ishlatilgan: {promo.used_count}/{promo.max_uses} |
                         Tugash: {new Date(promo.expires_at).toLocaleString('uz-UZ')}
                       </p>
+                      {usageMap[promo.id] && usageMap[promo.id].length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {usageMap[promo.id].map((u, j) => (
+                            <div key={j} className="flex items-center gap-2 text-xs text-gray-400">
+                              <CheckCircle className="w-3 h-3 text-emerald-400" />
+                              <span className="text-gray-300">{u.email}</span>
+                              <span className="text-gray-600">— {new Date(u.used_at).toLocaleString('uz-UZ')}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <Button
                       size="sm"
