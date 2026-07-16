@@ -483,10 +483,10 @@ function UsersList() {
       .eq('user_id', user.id)
       .eq('status', 'active');
 
-    await supabase.rpc('admin_update_client_access', {
-      p_user_id: user.id,
-      p_subscription_active: false,
-    });
+    await supabase
+      .from('client_access')
+      .update({ subscription_active: false })
+      .eq('user_id', user.id);
 
     toast.success('Obuna olib tashlandi');
     load();
@@ -513,11 +513,10 @@ function UsersList() {
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
       });
-    await supabase.rpc('admin_update_client_access', {
-      p_user_id: user.id,
-      p_subscription_active: true,
-      p_subscription_end_date: endDate.toISOString(),
-    });
+    await supabase
+      .from('client_access')
+      .update({ subscription_active: true, subscription_end_date: endDate.toISOString() })
+      .eq('user_id', user.id);
     setExtending(null);
     toast.success('Obuna uzaytirildi');
     load();
