@@ -902,6 +902,12 @@ function PromoCodes() {
 
   useEffect(() => { load(); }, []);
 
+  // Har 5 sekundda yangilansin
+  useEffect(() => {
+    const interval = setInterval(load, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const createPromo = async () => {
     if (!newCode.trim() || !newPlanId) return;
     setCreating(true);
