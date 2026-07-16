@@ -171,10 +171,14 @@ function PendingPayments() {
       .order('end_date', { ascending: false })
       .maybeSingle();
 
-    const baseDate = currentSub && new Date(currentSub.end_date) > startDate
-      ? new Date(currentSub.end_date)
-      : startDate;
-    endDate = new Date(baseDate.getTime() + plan.duration_days * 24 * 60 * 60 * 1000);
+    if (plan.duration_days === -1) {
+      endDate = new Date('2099-12-31');
+    } else {
+      const baseDate = currentSub && new Date(currentSub.end_date) > startDate
+        ? new Date(currentSub.end_date)
+        : startDate;
+      endDate = new Date(baseDate.getTime() + plan.duration_days * 24 * 60 * 60 * 1000);
+    }
 
     const { error: subError } = await supabase.from('subscriptions').insert({
       user_id: receipt.user_id,
@@ -492,10 +496,14 @@ function UsersList() {
     setExtending(user.id);
     const startDate = new Date();
     let endDate: Date;
-    const base = user.active_subscription && new Date(user.active_subscription.end_date) > startDate
-      ? new Date(user.active_subscription.end_date)
-      : startDate;
-    endDate = new Date(base.getTime() + plan.duration_days * 24 * 60 * 60 * 1000);
+    if (plan.duration_days === -1) {
+      endDate = new Date('2099-12-31');
+    } else {
+      const base = user.active_subscription && new Date(user.active_subscription.end_date) > startDate
+        ? new Date(user.active_subscription.end_date)
+        : startDate;
+      endDate = new Date(base.getTime() + plan.duration_days * 24 * 60 * 60 * 1000);
+    }
     await supabase
       .from('subscriptions')
       .insert({
@@ -545,6 +553,7 @@ function UsersList() {
       <div className="space-y-3">
         {filtered.map((u, i) => {
           const sub = u.active_subscription;
+          const isCheksiz = sub && sub.plan && new Date(sub.end_date).getFullYear() >= 2099;
           const daysLeft = sub
             ? Math.max(0, Math.ceil((new Date(sub.end_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
             : null;
@@ -576,8 +585,8 @@ function UsersList() {
                       {sub ? (
                         <>
                           <span className="text-gray-600 dark:text-gray-300">{sub.plan?.name}</span>
-                          <Badge tone={(daysLeft ?? 0) > 0 ? 'success' : 'error'}>
-                            {(daysLeft ?? 0) > 0 ? `${daysLeft} kun qoldi` : 'Tugagan'}
+                          <Badge tone="success">
+                            {isCheksiz ? 'Cheksiz Obuna' : (daysLeft ?? 0) > 0 ? `${daysLeft} kun qoldi` : 'Tugagan'}
                           </Badge>
                         </>
                       ) : (

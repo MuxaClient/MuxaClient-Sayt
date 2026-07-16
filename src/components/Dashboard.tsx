@@ -208,6 +208,7 @@ export default function Dashboard() {
   };
 
   const daysLeft = getDaysLeft();
+  const isCheksiz = subscription && subscription.plan && new Date(subscription.end_date).getFullYear() >= 2099;
   const isActive = subscription?.status === 'active' && daysLeft !== 0;
   const userEmail = profile?.email || user?.email || 'user';
 
@@ -404,7 +405,7 @@ export default function Dashboard() {
               Qolgan kunlar
             </div>
             <span className="text-gray-900 dark:text-white font-medium text-lg">
-              {daysLeft !== null ? `${daysLeft} kun` : '—'}
+              {isCheksiz ? 'Cheksiz' : daysLeft !== null ? `${daysLeft} kun` : '—'}
             </span>          </Card>
         </motion.div>
         
@@ -417,7 +418,9 @@ export default function Dashboard() {
             </div>
             <span className="text-gray-900 dark:text-white font-medium text-sm">
               {subscription && subscription.status === 'active'
-                ? new Date(subscription.end_date).toLocaleDateString('uz-UZ')
+                ? isCheksiz
+                  ? 'Cheksiz Obuna'
+                  : new Date(subscription.end_date).toLocaleDateString('uz-UZ')
                 : '—'}
             </span>
           </Card>
