@@ -934,9 +934,10 @@ function PromoCodes() {
     setCreating(false);
   };
 
-  const toggleActive = async (promo: PromoCodeRecord) => {
-    await supabase.from('promo_codes').update({ is_active: !promo.is_active }).eq('id', promo.id);
-    toast.success(promo.is_active ? 'Promokod o\'chirildi' : 'Promokod faollashtirildi');
+  const deletePromo = async (promo: PromoCodeRecord) => {
+    await supabase.from('promo_code_usage').delete().eq('promo_code_id', promo.id);
+    await supabase.from('promo_codes').delete().eq('id', promo.id);
+    toast.success('Promokod butunlay o\'chirildi');
     load();
   };
 
@@ -1015,11 +1016,7 @@ function PromoCodes() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {promoCodes.filter((promo) => {
-            const expired = new Date(promo.expires_at) < new Date();
-            const isFull = promo.used_count >= promo.max_uses;
-            return promo.is_active && !expired && !isFull;
-          }).map((promo, i) => {
+          {promoCodes.map((promo, i) => {
 
             return (
               <motion.div
@@ -1033,9 +1030,6 @@ function PromoCodes() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <code className="text-accent font-bold text-sm tracking-wider">{promo.code}</code>
-                        <Badge tone={expired || isFull || !promo.is_active ? 'error' : 'success'}>
-                          {!promo.is_active ? 'O\'chirilgan' : expired ? 'Muddati tugagan' : isFull ? 'To\'lgan' : 'Faol'}
-                        </Badge>
                       </div>
                       <p className="text-gray-500 dark:text-gray-400 text-xs">
                         Tarif: {promo.plan?.name} |
@@ -1056,11 +1050,11 @@ function PromoCodes() {
                     </div>
                     <Button
                       size="sm"
-                      variant={promo.is_active ? 'ghost' : 'success'}
-                      onClick={() => toggleActive(promo)}
-                      className="min-w-[80px] shrink-0"
+                      variant="ghost"
+                      onClick={() => deletePromo(promo)}
+                      className="min-w-[80px] shrink-0 text-red-400 hover:text-red-300"
                     >
-                      {promo.is_active ? 'O\'chirish' : 'Faol'}
+                      O'chirish
                     </Button>
                   </div>
                 </Card>
