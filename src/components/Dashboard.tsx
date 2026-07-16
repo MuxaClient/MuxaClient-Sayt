@@ -72,106 +72,24 @@ export default function Dashboard() {
     setPromoSuccess(false);
 
     try {
-      // Find active promo code
-      const { data: promo, error: promoError } = await supabase
-        .from('promo_codes')
-        .select('*')
-        .eq('code', code)
-        .maybeSingle();
-
-      if (promoError || !promo) {
-        setPromoError('Promokod topilmadi');
-        setPromoLoading(false);
-        return;
-      }
-
-      // Check if expired
-      if (new Date(promo.expires_at) < new Date()) {
-        setPromoError('Promokod muddati tugagan');
-        setPromoLoading(false);
-        return;
-      }
-
-      // Check if inactive or max uses reached
-      if (!promo.is_active || promo.used_count >= promo.max_uses) {
-        setPromoError('Promokod tugagan');
-        setPromoLoading(false);
-        return;
-      }
-
-      // Check if user already used this code
-      const { data: existingUsage } = await supabase
-        .from('promo_code_usage')
-        .select('id')
-        .eq('promo_code_id', promo.id)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (existingUsage) {
-        setPromoError('Siz bu promokodni allaqachon ishlatgansiz');
-        setPromoLoading(false);
-        return;
-      }
-
-      // Get the plan
-      const { data: plan } = await supabase
-        .from('plans')
-        .select('*')
-        .eq('id', promo.plan_id)
-        .single();
-
-      if (!plan) {
-        setPromoError('Tarif topilmadi');
-        setPromoLoading(false);
-        return;
-      }
-
-      // Create subscription
-      const startDate = new Date();
-      let endDate: Date;
-      if (plan.duration_days === -1) {
-        endDate = new Date('2099-12-31');
-      } else {
-        const { data: currentSub } = await supabase
-          .from('subscriptions')
-          .select('end_date')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .order('end_date', { ascending: false })
-          .maybeSingle();
-
-        const baseDate = currentSub && new Date(currentSub.end_date) > startDate
-          ? new Date(currentSub.end_date)
-          : startDate;
-        endDate = new Date(baseDate.getTime() + plan.duration_days * 24 * 60 * 60 * 1000);
-      }
-
-      const { error: subError } = await supabase.from('subscriptions').insert({
-        user_id: user.id,
-        plan_id: plan.id,
-        status: 'active',
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
+      const { data, error } = await supabase.rpc('use_promo_code', {
+        p_code: code,
+        p_user_id: user.id,
       });
 
-      if (subError) throw subError;
+      if (error) throw error;
 
-      // Record usage
-      await supabase.from('promo_code_usage').insert({
-        promo_code_id: promo.id,
-        user_id: user.id,
-      });
+      const result = data as { ok: boolean; error?: string; plan?: string; end_date?: string };
 
-      // Increment used_count
-      await supabase
-        .from('promo_codes')
-        .update({ used_count: promo.used_count + 1 })
-        .eq('id', promo.id);
+      if (!result.ok) {
+        setPromoError(result.error || 'Xatolik yuz berdi');
+        setPromoLoading(false);
+        return;
+      }
 
       setPromoSuccess(true);
-      toast.success(`Promokod qabul qilindi! ${plan.name} obunangiz faollashtirildi!`);
+      toast.success(`Promokod qabul qilindi! ${result.plan} obunangiz faollashtirildi!`);
 
-      // Refresh subscription
       const { data: newSub } = await supabase
         .from('subscriptions')
         .select('*, plan:plans(*)')
