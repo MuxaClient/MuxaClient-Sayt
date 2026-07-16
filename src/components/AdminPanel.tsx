@@ -1015,9 +1015,11 @@ function PromoCodes() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {promoCodes.map((promo, i) => {
+          {promoCodes.filter((promo) => {
             const expired = new Date(promo.expires_at) < new Date();
             const isFull = promo.used_count >= promo.max_uses;
+            return promo.is_active && !expired && !isFull;
+          }).map((promo, i) => {
 
             return (
               <motion.div
