@@ -22,6 +22,8 @@ import {
   Image as ImageIcon,
   X,
   FileUp,
+  Gift,
+  Tag,
 } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
@@ -45,9 +47,18 @@ export default function PaymentPage({
   const [success, setSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoYoutuber, setPromoYoutuber] = useState('');
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoApplied, setPromoApplied] = useState(false);
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('uz-UZ').format(price) + " so'm";
+
+  const discountedPrice = promoDiscount > 0
+    ? Math.round(plan.price * (1 - promoDiscount / 100))
+    : plan.price;
 
   const handleFile = useCallback((f: File) => {
     setError(null);
@@ -77,6 +88,32 @@ export default function PaymentPage({
     setCopied(true);
     toast.success('Karta raqami nusxalandi');
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const validatePromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoLoading(true);
+    try {
+      const { data, error } = await supabase.rpc('validate_yt_promo', {
+        p_code: promoCode.trim().toUpperCase(),
+      });
+      if (error) throw error;
+      if (data && data[0]?.valid) {
+        setPromoDiscount(data[0].discount_percent);
+        setPromoYoutuber(data[0].youtuber_name);
+        setPromoApplied(true);
+        toast.success(`Promo qabul qilindi! ${data[0].discount_percent}% chegirma (${data[0].youtuber_name})`);
+      } else {
+        toast.error(data?.[0]?.message || 'Promo kod noto\'g\'ri');
+        setPromoDiscount(0);
+        setPromoApplied(false);
+      }
+    } catch (err) {
+      toast.error('Promo tekshirishda xatolik');
+      setPromoDiscount(0);
+      setPromoApplied(false);
+    }
+    setPromoLoading(false);
   };
 
   const handleUpload = async () => {
@@ -178,8 +215,65 @@ export default function PaymentPage({
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">To'lov ma'lumotlari</h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mb-8">
           Tanlangan reja:{' '}
-          <span className="text-accent font-medium">{plan.name}</span> — {formatPrice(plan.price)}
+          <span className="text-accent font-medium">{plan.name}</span> —{' '}
+          {promoApplied && (
+            <span className="text-gray-500 line-through text-xs mr-1">{formatPrice(plan.price)}</span>
+          )}
+          <span className="text-accent font-medium">{formatPrice(discountedPrice)}</span>
         </p>
+      </motion.div>
+
+      {/* YT Promo Code Input */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+        <Card className="p-4 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Gift className="w-4 h-4 text-accent" />
+            <span className="text-gray-900 dark:text-white text-sm font-medium">YouTuber promo kodi</span>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => {
+                setPromoCode(e.target.value.toUpperCase());
+                if (promoApplied) {
+                  setPromoApplied(false);
+                  setPromoDiscount(0);
+                }
+              }}
+              placeholder="Promo kodni kiriting..."
+              disabled={promoApplied}
+              className="flex-1 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm placeholder-gray-500 outline-none disabled:opacity-50"
+            />
+            {promoApplied ? (
+              <button
+                onClick={() => {
+                  setPromoApplied(false);
+                  setPromoDiscount(0);
+                  setPromoCode('');
+                  setPromoYoutuber('');
+                }}
+                className="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm font-medium hover:bg-red-500/30 transition-all"
+              >
+                Bekor
+              </button>
+            ) : (
+              <button
+                onClick={validatePromo}
+                disabled={promoLoading || !promoCode.trim()}
+                className="px-4 py-2 rounded-xl bg-accent/20 border border-accent/30 text-accent text-sm font-medium hover:bg-accent/30 transition-all disabled:opacity-50"
+              >
+                {promoLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Tag className="w-4 h-4" />}
+              </button>
+            )}
+          </div>
+          {promoApplied && (
+            <p className="text-emerald-400 text-xs mt-2 flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" />
+              {promoDiscount}% chegirma — YouTuber: {promoYoutuber}
+            </p>
+          )}
+        </Card>
       </motion.div>
 
       {/* Card info */}
@@ -210,7 +304,12 @@ export default function PaymentPage({
 
           <div className="mt-3 flex items-center justify-between text-xs">
             <span className="text-gray-500 dark:text-gray-500">To'lov summasi:</span>
-            <span className="text-accent font-medium">{formatPrice(plan.price)}</span>
+            <div className="text-right">
+              {promoApplied && (
+                <span className="text-gray-500 line-through text-xs mr-2">{formatPrice(plan.price)}</span>
+              )}
+              <span className="text-accent font-medium">{formatPrice(discountedPrice)}</span>
+            </div>
           </div>
         </Card>
       </motion.div>

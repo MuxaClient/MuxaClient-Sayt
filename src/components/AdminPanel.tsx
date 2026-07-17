@@ -27,7 +27,7 @@ import { Input } from './ui/Input';
 import { Modal } from './ui/Modal';
 import { toast } from 'sonner';
 
-type Tab = 'pending' | 'users' | 'plans' | 'promo';
+type Tab = 'pending' | 'users' | 'plans' | 'promo' | 'ytpromo';
 
 type UserWithSub = Profile & {
   active_subscription?: Subscription | null;
@@ -41,6 +41,7 @@ export default function AdminPanel() {
     { key: 'users', label: 'Foydalanuvchilar', icon: <Users className="w-4 h-4" /> },
     { key: 'plans', label: 'Tariflar', icon: <Settings className="w-4 h-4" /> },
     { key: 'promo', label: 'Promokodlar', icon: <Tag className="w-4 h-4" /> },
+    { key: 'ytpromo', label: 'YT Promo', icon: <Gift className="w-4 h-4" /> },
   ];
 
   return (
@@ -92,6 +93,7 @@ export default function AdminPanel() {
           {tab === 'users' && <UsersList />}
           {tab === 'plans' && <PlansEditor />}
           {tab === 'promo' && <PromoCodes />}
+          {tab === 'ytpromo' && <YtPromoCodes />}
         </motion.div>
       </AnimatePresence>
     </div>
@@ -855,8 +857,213 @@ function PlansEditor() {
 }
 
 // ============================================================
-// PROMO CODES
+// YT PROMO CODES — YouTuberlar uchun maxsus chegirma promolari
 // ============================================================
+type YtPromoRecord = {
+  id: string;
+  youtuber_name: string;
+  code: string;
+  discount_percent: number;
+  max_uses: number;
+  current_uses: number;
+  active: boolean;
+  created_at: string;
+};
+
+function YtPromoCodes() {
+  const [promos, setPromos] = useState<YtPromoRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newYoutuber, setNewYoutuber] = useState('');
+  const [newCode, setNewCode] = useState('');
+  const [newDiscount, setNewDiscount] = useState(10);
+  const [newMaxUses, setNewMaxUses] = useState(100);
+  const [creating, setCreating] = useState(false);
+
+  const load = async () => {
+    const { data } = await supabase
+      .from('yt_promos')
+      .select('*')
+      .order('created_at', { ascending: false });
+    setPromos(data ?? []);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const interval = setInterval(load, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const createPromo = async () => {
+    if (!newYoutuber.trim() || !newCode.trim()) return;
+    setCreating(true);
+
+    const { error } = await supabase.rpc('create_yt_promo', {
+      p_youtuber_name: newYoutuber.trim(),
+      p_code: newCode.trim().toUpperCase(),
+      p_discount_percent: newDiscount,
+      p_max_uses: newMaxUses,
+    });
+
+    if (error) {
+      toast.error('Xatolik: ' + error.message);
+    } else {
+      toast.success(`YT Promo ${newCode.trim().toUpperCase()} yaratildi! (${newDiscount}% chegirma)`);
+      setNewYoutuber('');
+      setNewCode('');
+      setNewDiscount(10);
+      setNewMaxUses(100);
+      load();
+    }
+    setCreating(false);
+  };
+
+  const toggleActive = async (promo: YtPromoRecord) => {
+    await supabase
+      .from('yt_promos')
+      .update({ active: !promo.active })
+      .eq('id', promo.id);
+    toast.success(promo.active ? 'Promo o\'chirildi' : 'Promo faollashtirildi');
+    load();
+  };
+
+  const deletePromo = async (promo: YtPromoRecord) => {
+    await supabase.rpc('delete_yt_promo', { p_id: promo.id });
+    toast.success('Promo butunlay o\'chirildi');
+    load();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {/* Yangi YT Promo yaratish */}
+      <Card className="p-6 mb-6">
+        <h3 className="text-gray-900 dark:text-white font-medium mb-4 flex items-center gap-2">
+          <Gift className="w-5 h-5 text-accent" />
+          Yangi YT Promo yaratish
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <div>
+            <label className="text-gray-500 dark:text-gray-400 text-xs mb-1 block">YouTuber nomi</label>
+            <Input
+              type="text"
+              value={newYoutuber}
+              onChange={(e) => setNewYoutuber(e.target.value)}
+              placeholder="MASALAN: MuxaClient"
+              className="bg-white/5 border-white/10 text-white placeholder-gray-500"
+            />
+          </div>
+          <div>
+            <label className="text-gray-500 dark:text-gray-400 text-xs mb-1 block">Promo kodi</label>
+            <Input
+              type="text"
+              value={newCode}
+              onChange={(e) => setNewCode(e.target.value.toUpperCase())}
+              placeholder="MASALAN: MUXA20"
+              className="bg-white/5 border-white/10 text-white placeholder-gray-500"
+            />
+          </div>
+          <div>
+            <label className="text-gray-500 dark:text-gray-400 text-xs mb-1 block">Chegirma %</label>
+            <Input
+              type="number"
+              min={1}
+              max={100}
+              value={newDiscount}
+              onChange={(e) => setNewDiscount(parseInt(e.target.value) || 10)}
+              className="bg-white/5 border-white/10 text-white"
+            />
+          </div>
+          <div>
+            <label className="text-gray-500 dark:text-gray-400 text-xs mb-1 block">Max ishlatish (0=cheksiz)</label>
+            <Input
+              type="number"
+              min={0}
+              value={newMaxUses}
+              onChange={(e) => setNewMaxUses(parseInt(e.target.value) || 100)}
+              className="bg-white/5 border-white/10 text-white"
+            />
+          </div>
+          <div className="flex items-end">
+            <Button
+              onClick={createPromo}
+              disabled={creating || !newYoutuber.trim() || !newCode.trim()}
+              className="w-full"
+            >
+              {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gift className="w-4 h-4" />}
+              Yaratish
+            </Button>
+          </div>
+        </div>
+        <p className="text-gray-500 text-xs mt-3">
+          YouTuber uchun maxsus promo kod yarating. Foydalanuvchilar sotib olish vaqtida promo kodni kiritib, chegirma olishlari mumkin.
+        </p>
+      </Card>
+
+      {/* Mavjud YT Promolar */}
+      {promos.length === 0 ? (
+        <Card className="p-12 text-center">
+          <Gift className="w-12 h-12 text-accent mx-auto mb-3" />
+          <p className="text-gray-900 dark:text-white font-medium">YT Promo yo'q</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Hali hech qanday YT promo yaratilmagan</p>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {promos.map((promo, i) => (
+            <motion.div
+              key={promo.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03 }}
+            >
+              <Card className="p-4 hover:bg-white/10 dark:hover:bg-white/5 transition-all">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <code className="text-accent font-bold text-sm tracking-wider">{promo.code}</code>
+                      <Badge tone={promo.active ? 'success' : 'error'}>
+                        {promo.discount_percent}% chegirma
+                      </Badge>
+                      <Badge tone="info">{promo.youtuber_name}</Badge>
+                    </div>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">
+                      Ishlatilgan: {promo.current_uses}/{promo.max_uses || 'cheksiz'} |
+                      Yaratilgan: {new Date(promo.created_at).toLocaleString('uz-UZ')}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <Button
+                      size="sm"
+                      variant={promo.active ? 'success' : 'ghost'}
+                      onClick={() => toggleActive(promo)}
+                    >
+                      {promo.active ? 'Faol' : 'O\'chirilgan'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => deletePromo(promo)}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 type PromoCodeRecord = {
   id: string;
   code: string;
