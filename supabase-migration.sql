@@ -208,6 +208,10 @@ DROP POLICY IF EXISTS "authenticated_update_client_access" ON client_access;
 CREATE POLICY "authenticated_update_client_access" ON client_access FOR UPDATE
   USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "admin_full_client_access" ON client_access;
+CREATE POLICY "admin_full_client_access" ON client_access FOR ALL
+  USING (is_admin()) WITH CHECK (is_admin());
+
 -- 9. HANDLE NEW USER TRIGGER
 -- ============================================
 CREATE OR REPLACE FUNCTION handle_new_user()
